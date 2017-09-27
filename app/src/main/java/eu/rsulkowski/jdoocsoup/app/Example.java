@@ -1,4 +1,4 @@
-package eu.rsulkowski.jdoocsoup;
+package eu.rsulkowski.jdoocsoup.app;
 
 import eu.rsulkowski.jdoocsoup.annotation.Builder;
 
@@ -8,5 +8,9 @@ import eu.rsulkowski.jdoocsoup.annotation.Builder;
 
 @Builder
 public class Example {
+
+    int id;
+    String name;
+    long timestamp;
 
 }
