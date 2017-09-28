@@ -145,8 +145,7 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
     private void createJavaFile(JavaFile javaFile) {
         try {
-
-            javaFile.writeTo(new File("build/generated/jdoocs"));
+            javaFile.writeTo(processingEnv.getFiler());
         } catch (IOException e) {
             e.printStackTrace();
         }
