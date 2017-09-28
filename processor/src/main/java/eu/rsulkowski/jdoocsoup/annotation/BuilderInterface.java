@@ -7,10 +7,12 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface Builder {
+public @interface BuilderInterface {
+
+    String dataClassName() default "";
 
     @Retention(RetentionPolicy.SOURCE)
-    @Target(ElementType.FIELD)
+    @Target(ElementType.METHOD)
     @interface Setter {
         String description() default "";
     }
