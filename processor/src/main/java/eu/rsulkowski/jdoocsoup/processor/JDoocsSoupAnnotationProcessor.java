@@ -2,6 +2,7 @@ package eu.rsulkowski.jdoocsoup.processor;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -11,6 +12,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
@@ -42,8 +45,8 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
             if (annotatedElement.getKind() == ElementKind.INTERFACE) {
                 TypeElement element = (TypeElement) annotatedElement;
 
-                TypeSpec builderClassSpec = prepareBuilderInterfaceImplementationSpec(annotatedElement, element);
-                TypeSpec dataClassSpec = prepareDataClassSpec(annotatedElement);
+                TypeSpec builderClassSpec = prepareDataClassBuilderSpec(annotatedElement, element);
+                TypeSpec dataClassSpec = prepareDataClassSpec(annotatedElement, element);
 
                 createJavaFileForTypeSpec(element, dataClassSpec);
                 createJavaFileForTypeSpec(element, builderClassSpec);
@@ -59,7 +62,7 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
         createJavaFile(javaFile);
     }
 
-    private TypeSpec prepareBuilderInterfaceImplementationSpec(Element annotatedElement, TypeElement element) {
+    private TypeSpec prepareDataClassBuilderSpec(Element annotatedElement, TypeElement element) {
         MethodSpec builder = getBuilderMethodSpec(element);
         MethodSpec build = getBuildMethodSpec(element);
 
@@ -72,13 +75,38 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
                 .build();
     }
 
-    private TypeSpec prepareDataClassSpec(Element annotatedElement) {
+    private TypeSpec prepareDataClassSpec(Element annotatedElement, TypeElement element) {
 
         String dataClassName = parseDataClassName(annotatedElement);
 
         return TypeSpec.classBuilder(dataClassName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addMethod(createDataClassConstructor(annotatedElement))
+                .addFields(createFieldsSpec(element))
                 .build();
+    }
+
+    private MethodSpec createDataClassConstructor(Element annotatedElement) {
+        TypeElement element = (TypeElement) annotatedElement;
+        Iterable<ParameterSpec> parameterSpec = createParamSpecs(element);
+
+
+        MethodSpec.Builder constructorSpec = MethodSpec.constructorBuilder()
+                .addParameters(parameterSpec)
+                .addCode(initAllFieldsInConstructor(parameterSpec));
+
+        return constructorSpec.build();
+    }
+
+    private CodeBlock initAllFieldsInConstructor(Iterable<ParameterSpec> params) {
+
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
+
+        for (ParameterSpec spec : params) {
+            codeBlockBuilder.add("this.$N = $N;\n", spec.name, spec.name);
+        }
+
+        return codeBlockBuilder.build();
     }
 
     private String parseDataClassName(Element annotatedElement) {
@@ -94,14 +122,25 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
         for (Element el : element.getEnclosedElements()) {
             if (el.getKind() == ElementKind.METHOD) {
-
-//                ParameterSpec parameterSpec = obtainParamSpec(el);
-//                fields.add(FieldSpec.builder(parameterSpec.type, parameterSpec.name).addModifiers(Modifier.PRIVATE)
-//                        .build());
+                ParameterSpec parameterSpec = obtainParamSpec(el);
+                fields.add(FieldSpec.builder(parameterSpec.type, parameterSpec.name).addModifiers(Modifier.PRIVATE)
+                        .build());
             }
         }
 
         return fields;
+    }
+
+    private Iterable<ParameterSpec> createParamSpecs(TypeElement element) {
+        List<ParameterSpec> params = new ArrayList<>();
+
+        for (Element el : element.getEnclosedElements()) {
+            if (el.getKind() == ElementKind.METHOD) {
+                params.add(obtainParamSpec(el));
+            }
+        }
+
+        return params;
     }
 
     private MethodSpec getBuilderMethodSpec(TypeElement element) {
@@ -119,8 +158,29 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc("Constructs the new object of type: {@link $T}.", ClassName.get(element))
                 .returns(ClassName.get(parsePackageName(element), parseDataClassName(element)))
-                .addStatement("return new " + parseDataClassName(element) + "()")
+                .addCode(createNewObject(element))
                 .build();
+    }
+
+    private CodeBlock createNewObject(TypeElement element) {
+        CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
+        Iterable<ParameterSpec> params = createParamSpecs(element);
+        codeBlockBuilder.add("return new $N(", parseDataClassName(element));
+
+        Iterator<ParameterSpec> iterator = params.iterator();
+
+        while(iterator.hasNext()) {
+            ParameterSpec param = iterator.next();
+            if (iterator.hasNext()) {
+                codeBlockBuilder.add("$N,", param.name);
+            } else {
+                codeBlockBuilder.add("$N", param.name);
+            }
+        }
+
+        codeBlockBuilder.add(");\n");
+
+        return codeBlockBuilder.build();
     }
 
     private List<MethodSpec> createMutatorMethodsSpec(TypeElement element) {
@@ -128,14 +188,14 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
         List<MethodSpec> methods = new ArrayList<>();
 
         for (Element el : element.getEnclosedElements()) {
-            if (el.getKind() == ElementKind.FIELD) {
+            if (el.getKind() == ElementKind.METHOD) {
 
                 ParameterSpec parameterSpec = obtainParamSpec(el, "value");
 
                 MethodSpec.Builder methodSpecBuilder = MethodSpec.methodBuilder(el.getSimpleName().toString())
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(parameterSpec)
-                        .returns(ClassName.get(parsePackageName(element), element.getSimpleName() + BUILDER_NAME_POSTFIX))
+                        .returns(ClassName.get(parsePackageName(element), parseDataClassName(element) + BUILDER_NAME_POSTFIX))
                         .addStatement("this." + el.getSimpleName().toString() + " = " + parameterSpec.name)
                         .addStatement("return this");
 
@@ -160,11 +220,13 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
     }
 
     private static ParameterSpec obtainParamSpec(Element element, String overrideName) {
-        TypeName type = TypeName.get(element.asType());
+
+        ExecutableElement executableElement = (ExecutableElement) element;
+
+        TypeName type = TypeName.get(executableElement.getReturnType());
         String name = overrideName == null ? element.getSimpleName().toString() : overrideName;
 
         return ParameterSpec.builder(type, name)
-                .addModifiers(element.getModifiers())
                 .build();
     }
 
