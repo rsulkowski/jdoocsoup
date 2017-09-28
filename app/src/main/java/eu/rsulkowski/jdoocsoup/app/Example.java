@@ -9,8 +9,20 @@ import eu.rsulkowski.jdoocsoup.annotation.Builder;
 @Builder
 public class Example {
 
+    /**
+     * Id of the Example.
+     */
+    @Builder.Setter(description = "Sets the id of the Example.")
     int id;
+
+    /**
+     *
+     */
     String name;
+
+    /**
+     *
+     */
     long timestamp;
 
 }

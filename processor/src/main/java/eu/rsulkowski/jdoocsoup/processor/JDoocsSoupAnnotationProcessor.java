@@ -78,6 +78,7 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
     private MethodSpec getBuilderMethodSpec(TypeElement element) {
         return MethodSpec.methodBuilder("builder")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addJavadoc("Creates the new builder instance.")
                 .returns(ClassName.get(parsePackageName(element), element.getSimpleName() + BUILDER_NAME_POSTFIX))
                 .addStatement("return new " + element.getSimpleName() + BUILDER_NAME_POSTFIX + "()")
                 .build();
@@ -87,6 +88,7 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
         return MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
+                .addJavadoc("Constructs the new object of type: {@link $T}.", ClassName.get(element))
                 .returns(ClassName.get(parsePackageName(element), element.getSimpleName().toString()))
                 .addStatement("return new " + element.getSimpleName() + "()")
                 .build();
@@ -98,19 +100,32 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
         for (Element el : element.getEnclosedElements()) {
             if (el.getKind() == ElementKind.FIELD) {
+
                 ParameterSpec parameterSpec = obtainParamSpec((VariableElement) el, "value");
-                methods.add(MethodSpec.methodBuilder(el.getSimpleName().toString())
+
+                MethodSpec.Builder methodSpecBuilder = MethodSpec.methodBuilder(el.getSimpleName().toString())
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(parameterSpec)
                         .returns(ClassName.get(parsePackageName(element), element.getSimpleName() + BUILDER_NAME_POSTFIX))
                         .addStatement("this." + el.getSimpleName().toString() + " = " + parameterSpec.name)
-                        .addStatement("return this")
-                        .build());
+                        .addStatement("return this");
+
+                prepareJavadocsIfAvailable(el, methodSpecBuilder);
+
+                methods.add(methodSpecBuilder.build());
             }
         }
 
         return methods;
     }
+
+    private void prepareJavadocsIfAvailable(Element el, MethodSpec.Builder methodSpecBuilder) {
+        Builder.Setter setterAnnotation = el.getAnnotation(Builder.Setter.class);
+        if (setterAnnotation != null) {
+            methodSpecBuilder.addJavadoc(setterAnnotation.description());
+        }
+    }
+
 
     private static ParameterSpec obtainParamSpec(VariableElement element) {
         return obtainParamSpec(element, null);

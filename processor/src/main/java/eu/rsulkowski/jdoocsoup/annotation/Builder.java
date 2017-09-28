@@ -8,4 +8,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Builder {
+
+    @Retention(RetentionPolicy.SOURCE)
+    @Target(ElementType.FIELD)
+    @interface Setter {
+        String description() default "";
+    }
 }
