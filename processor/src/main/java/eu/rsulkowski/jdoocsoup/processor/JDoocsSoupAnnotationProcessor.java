@@ -1,5 +1,6 @@
 package eu.rsulkowski.jdoocsoup.processor;
 
+import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -27,6 +29,7 @@ import eu.rsulkowski.jdoocsoup.annotation.BuilderInterface;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes("eu.rsulkowski.jdoocsoup.annotation.BuilderInterface")
+@AutoService(Processor.class)
 public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
     private final static String BUILDER_NAME_POSTFIX = "Builder";
@@ -91,6 +94,7 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor {
 
         for (Element el : element.getEnclosedElements()) {
             if (el.getKind() == ElementKind.METHOD) {
+
 //                ParameterSpec parameterSpec = obtainParamSpec(el);
 //                fields.add(FieldSpec.builder(parameterSpec.type, parameterSpec.name).addModifiers(Modifier.PRIVATE)
 //                        .build());
