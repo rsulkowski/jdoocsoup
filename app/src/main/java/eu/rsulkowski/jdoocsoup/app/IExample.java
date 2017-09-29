@@ -1,6 +1,7 @@
 package eu.rsulkowski.jdoocsoup.app;
 
 import eu.rsulkowski.jdoocsoup.annotation.BuilderInterface;
+import eu.rsulkowski.jdoocsoup.annotation.Setter;
 
 /**
  * Created by rsulkowski on 9/27/17.
@@ -12,14 +13,14 @@ public interface IExample {
     /**
      * Id of the Example.
      */
-    @BuilderInterface.Setter(description = "Sets the id of the Example.")
+    @Setter(jdocs = "Sets the id of the Example.")
     int id();
 
     /**
      *
      */
     String name();
-    
+
     /**
      *
      */

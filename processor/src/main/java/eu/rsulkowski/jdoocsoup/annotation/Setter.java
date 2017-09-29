@@ -5,8 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Created by sulkowsk on 29/09/2017.
+ */
+
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.TYPE)
-public @interface BuilderInterface {
-    String dataClassName() default "";
+@Target(ElementType.METHOD)
+public @interface Setter {
+    String jdocs() default "";
 }
