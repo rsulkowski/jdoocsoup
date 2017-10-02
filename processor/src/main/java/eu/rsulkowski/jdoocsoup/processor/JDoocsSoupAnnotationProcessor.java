@@ -20,34 +20,35 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import eu.rsulkowski.jdoocsoup.processor.handler.BaseAnnotationHandler;
-import eu.rsulkowski.jdoocsoup.processor.handler.BuilderInterfaceHandler;
-import eu.rsulkowski.jdoocsoup.processor.handler.SetterHandler;
+import eu.rsulkowski.jdoocsoup.processor.handler.DataClassBuilderHandler;
+import eu.rsulkowski.jdoocsoup.processor.handler.DataClassHandler;
 import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes({
-        "eu.rsulkowski.jdoocsoup.annotation.BuilderInterface"
+        "eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder",
+        "eu.rsulkowski.jdoocsoup.annotation.DataClass"
 })
 @AutoService(Processor.class)
 public class JDoocsSoupAnnotationProcessor extends AbstractProcessor implements BaseAnnotationHandler.AnnotationHandlerCallback {
 
 
-    private BuilderInterfaceHandler builderInterfaceHandler;
-    private SetterHandler setterHandler;
+    private DataClassBuilderHandler dataClassBuilderHandler;
+    private DataClassHandler dataClassHandler;
     private List<Pair<String, TypeSpec>> javaClassesToBeCreated = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
-        builderInterfaceHandler = new BuilderInterfaceHandler(this, processingEnvironment);
-        setterHandler = new SetterHandler(this, processingEnvironment);
+        dataClassBuilderHandler = new DataClassBuilderHandler(this, processingEnvironment);
+        dataClassHandler = new DataClassHandler(this, processingEnvironment);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
-        builderInterfaceHandler.process(roundEnvironment, this);
-        setterHandler.process(roundEnvironment, this);
+        dataClassBuilderHandler.process(roundEnvironment, this);
+        dataClassHandler.process(roundEnvironment, this);
 
         // The final work to be done.
         generateAllJavaClases();

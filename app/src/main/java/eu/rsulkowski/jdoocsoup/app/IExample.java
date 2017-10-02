@@ -1,21 +1,26 @@
 package eu.rsulkowski.jdoocsoup.app;
 
-import eu.rsulkowski.jdoocsoup.annotation.BuilderInterface;
-import eu.rsulkowski.jdoocsoup.annotation.Getter;
-import eu.rsulkowski.jdoocsoup.annotation.Setter;
+import eu.rsulkowski.jdoocsoup.annotation.DataClass;
+import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 
 /**
  * Created by rsulkowski on 9/27/17.
  */
 
-@BuilderInterface
-public interface IExample {
+
+
+@DataClassBuilder
+@DataClass.Getters
+@DataClass.Setters
+@DataClass
+interface IExample {
 
     /**
      * Id of the Example.
      */
-    @Setter(jdocs = "Sets the id of the Example.")
-    @Getter(jdocs = "Obtains the id of the Example", jdocsReturn = "id - the id of the Example")
+    @DataClassBuilder.MethodDocs(text = "Sets the id of the Example.")
+    @DataClass.SetterDocs(text = "Sets the id of the Example.")
+    @DataClass.GetterDocs(text = "Obtains the id of the Example", returnText = "id - the id of the Example")
     int id();
 
     /**
@@ -27,5 +32,12 @@ public interface IExample {
      *
      */
     long timestamp();
+
+//    @DataClass.Method(params = {"int a", "int b"})
+//    long someMethodImplementation() /*{
+//       for (int i = 0; i < 10; i++){
+//            doSomething(a, b);
+//       }
+//    }*/;
 
 }

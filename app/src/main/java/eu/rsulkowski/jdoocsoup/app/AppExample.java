@@ -10,8 +10,7 @@ public class AppExample {
 
     public void someExampleMethod() {
         Example example = ExampleBuilder.builder()
-                .id(1)
-                .name("exampleName")
+                .id(1).name("exampleName")
                 .timestamp(new Date().getTime())
                 .build();
     }

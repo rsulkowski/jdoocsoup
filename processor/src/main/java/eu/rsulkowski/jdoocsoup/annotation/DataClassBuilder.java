@@ -6,11 +6,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by sulkowsk on 29/09/2017.
+ * Created by rsulkowski on 02/10/2017.
  */
 
-@Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.METHOD)
-public @interface Setter {
+public @interface DataClassBuilder {
+    String name() default "";
     String jdocs() default "";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @Target(ElementType.METHOD)
+    @interface MethodDocs {
+        String text() default "";
+    }
+
 }
