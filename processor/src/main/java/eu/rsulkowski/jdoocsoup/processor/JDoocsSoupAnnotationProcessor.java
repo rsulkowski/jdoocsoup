@@ -21,34 +21,31 @@ import javax.tools.Diagnostic;
 
 import eu.rsulkowski.jdoocsoup.processor.handler.BaseAnnotationHandler;
 import eu.rsulkowski.jdoocsoup.processor.handler.DataClassBuilderHandler;
-import eu.rsulkowski.jdoocsoup.processor.handler.DataClassHandler;
 import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes({
-        "eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder",
-        "eu.rsulkowski.jdoocsoup.annotation.DataClass"
-})
+        "eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder"})
 @AutoService(Processor.class)
 public class JDoocsSoupAnnotationProcessor extends AbstractProcessor implements BaseAnnotationHandler.AnnotationHandlerCallback {
 
 
     private DataClassBuilderHandler dataClassBuilderHandler;
-    private DataClassHandler dataClassHandler;
+    //    private DataClassHandler dataClassHandler;
     private List<Pair<String, TypeSpec>> javaClassesToBeCreated = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         dataClassBuilderHandler = new DataClassBuilderHandler(this, processingEnvironment);
-        dataClassHandler = new DataClassHandler(this, processingEnvironment);
+//        dataClassHandler = new DataClassHandler(this, processingEnvironment);
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
         dataClassBuilderHandler.process(roundEnvironment, this);
-        dataClassHandler.process(roundEnvironment, this);
+//        dataClassHandler.process(roundEnvironment, this);
 
         // The final work to be done.
         generateAllJavaClases();

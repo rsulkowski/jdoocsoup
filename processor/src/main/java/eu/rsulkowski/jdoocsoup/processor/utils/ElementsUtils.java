@@ -12,5 +12,4 @@ public class ElementsUtils {
     public static String parsePackageName(ProcessingEnvironment env, TypeElement element) {
         return env.getElementUtils().getPackageOf(element).getQualifiedName().toString();
     }
-
 }
