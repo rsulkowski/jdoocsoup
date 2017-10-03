@@ -20,6 +20,9 @@ import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
  * Created by rsulkowski on 10/2/17.
  */
 
+/**
+ * Contains the description of the DataClassBuilder such as: package name, element kind etc.
+ */
 public class DataClassBuilderDescriptor {
 
     private final static String BUILDER_NAME_POSTFIX = "Builder";
