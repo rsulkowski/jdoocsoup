@@ -79,10 +79,10 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
 
                 FieldSpec fieldSpec = FieldSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).addModifiers(Modifier.PRIVATE).build();
 
-                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(var.getSimpleName().toString())
-                        .addParameter(ParameterSpec.get(var))
-                        .addStatement("this.$N=$N", var.getSimpleName(), var.getSimpleName())
-                        .addStatement("return new " + descriptor.getDataClassBuilderName() + "()")
+                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(var.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
+                        .addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).build())
+                        .addStatement("this.$N = $N", var.getSimpleName(), var.getSimpleName())
+                        .addStatement("return this")
                         .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
 
                 if (builderMethodDocsAnnotation != null) {
