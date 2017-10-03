@@ -23,9 +23,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
 
-    implementation project(":processor")
-    annotationProcessor project(":processor")
-    testAnnotationProcessor project(":processor")
+    implementation 'eu.rsulkowski:jdoocsoup:0.1'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
 
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:26.1.0'
