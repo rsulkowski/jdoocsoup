@@ -46,7 +46,7 @@ public class DataClassBuilderDescriptor {
     }
 
     private void parseAll() {
-        typeSpecBuilder.addJavadoc(annotation.jdocs());
+        typeSpecBuilder.addJavadoc(annotation.jdocs() + "\n");
 
         for (Element element : typeElement.getEnclosedElements()) {
             if (element.getKind() == ElementKind.METHOD) {

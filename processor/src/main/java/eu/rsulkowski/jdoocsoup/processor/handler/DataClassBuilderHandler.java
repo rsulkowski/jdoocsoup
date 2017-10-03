@@ -50,29 +50,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
     }
 
     private void parseDataFromDescriptor() {
-        if (descriptor.getElementKind() == ElementKind.INTERFACE) {
-            // TODO: NOT YET SUPPORTED
-
-//            for (ExecutableElement var : descriptor.getMethods()) {
-//
-//                DataClassBuilder.MethodDocs setterDocsAnnotation = var.getAnnotation(DataClassBuilder.MethodDocs.class);
-//
-//                FieldSpec fieldSpec = FieldSpec.builder(TypeName.get(var.getReturnType()), var.getSimpleName().toString()).build();
-//
-//                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(var.getSimpleName().toString())
-//                        .addParameter(ParameterSpec.builder(TypeName.get(var.getReturnType()), var.getSimpleName().toString()).build())
-//                        .addStatement("this.$N=$N", var.getSimpleName(), var.getSimpleName())
-//                        .addStatement("return new " + descriptor.getDataClassBuilderName() + "()")
-//                        .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
-//
-//                if (setterDocsAnnotation != null) {
-//                    methodSpec.addJavadoc(setterDocsAnnotation.text());
-//                }
-//
-//                builderClassSpecBuilder.addField(fieldSpec);
-//                builderClassSpecBuilder.addMethod(methodSpec.build());
-//            }
-        } else if (descriptor.getElementKind() == ElementKind.CLASS) {
+        if (descriptor.getElementKind() == ElementKind.CLASS) {
             for (VariableElement var : descriptor.getFields()) {
 
                 DataClassBuilder.MethodDocs builderMethodDocsAnnotation = var.getAnnotation(DataClassBuilder.MethodDocs.class);
@@ -86,7 +64,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                         .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
 
                 if (builderMethodDocsAnnotation != null) {
-                    methodSpec.addJavadoc(builderMethodDocsAnnotation.text());
+                    methodSpec.addJavadoc(builderMethodDocsAnnotation.text() + "\n");
                 }
 
                 builderClassSpecBuilder.addField(fieldSpec);
@@ -106,7 +84,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
     private MethodSpec createBuilderMethodSpec() {
         return MethodSpec.methodBuilder(descriptor.getAnnotation().builderMethodName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addJavadoc(descriptor.getAnnotation().builderMethodJDocs())
+                .addJavadoc(descriptor.getAnnotation().builderMethodJDocs() + "\n")
                 .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()))
                 .addStatement("return new " + descriptor.getDataClassBuilderName() + "()")
                 .build();
@@ -116,7 +94,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
 
         return MethodSpec.methodBuilder(descriptor.getAnnotation().buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
-                .addJavadoc(descriptor.getAnnotation().buildMethodJDocs())
+                .addJavadoc(descriptor.getAnnotation().buildMethodJDocs() + "\n")
                 .returns(ClassName.get(descriptor.getPackageName(), descriptor.getTypeElement().getSimpleName().toString()))
                 .addCode(createNewObject())
                 .build();

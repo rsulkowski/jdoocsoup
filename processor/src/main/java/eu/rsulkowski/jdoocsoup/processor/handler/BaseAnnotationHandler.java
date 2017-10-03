@@ -14,7 +14,7 @@ import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
 
 
 /**
- * Created by sulkowsk on 29/09/2017.
+ * Created by rsulkowski on 29/09/2017.
  */
 public abstract class BaseAnnotationHandler<T extends Annotation> {
 
