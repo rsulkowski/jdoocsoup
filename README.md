@@ -118,3 +118,41 @@ public class PersonBuilder {
   }
 }
 ```
+
+## Configuration
+
+To start you have to do following steps:
+
+1. Add repository to your root build.gradle:
+
+```groovy
+buildscript {
+
+    repositories {
+        //...
+    }
+    dependencies {
+        //...
+    }
+}
+
+allprojects {
+    repositories {
+        // ..
+        maven {
+            url  "https://dl.bintray.com/rsulkowski/jdoocsoup"
+        }
+    }
+}
+```
+
+2. Add dependencies to your project's build.gradle
+```groovy
+dependencies {
+    // ..
+    implementation 'eu.rsulkowski:jdoocsoup:0.1'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+    //..
+}
+```
