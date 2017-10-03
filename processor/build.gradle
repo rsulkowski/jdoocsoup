@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+apply plugin: 'com.jfrog.bintray'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -8,3 +9,24 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+apply from: '../scripts/maven_publish.gradle'
+
+bintray {
+    user = jdoocsoupPublishUser
+    key = jdoocsoupPublishKey
+    pkg {
+        repo = 'jdoocsoup'
+        name = 'jdoocsoup'
+        userOrg = 'rsulkowski'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/rsulkowski/jdoocsoup.git'
+        version {
+            name = '0.1'
+            desc = 'JDoocSoup v0.1'
+            released  = new Date()
+            vcsTag = '0.1'
+        }
+    }
+    publications = ['JDoocSoupPublication']
+}
