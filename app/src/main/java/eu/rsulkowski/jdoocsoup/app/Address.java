@@ -1,10 +1,12 @@
 package eu.rsulkowski.jdoocsoup.app;
 
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
+import lombok.Getter;
 
 /**
  * Created by rsulkowski on 10/3/17.
  */
+@Getter
 @DataClassBuilder(
         jdocs = "POJO class which represents the Address.",
         builderMethodJDocs = "Creates the new builder object for Address",

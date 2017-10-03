@@ -2,9 +2,13 @@ apply plugin: 'java-library'
 apply plugin: 'com.jfrog.bintray'
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.squareup:javapoet:1.9.0'
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+    
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.10.0'
 }
 
 sourceCompatibility = "1.7"

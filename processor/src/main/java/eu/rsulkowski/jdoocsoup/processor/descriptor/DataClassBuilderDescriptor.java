@@ -15,6 +15,7 @@ import javax.lang.model.element.VariableElement;
 
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
+import lombok.Getter;
 
 /**
  * Created by rsulkowski on 10/2/17.
@@ -23,6 +24,7 @@ import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 /**
  * Contains the description of the DataClassBuilder such as: package name, element kind etc.
  */
+@Getter
 public class DataClassBuilderDescriptor {
 
     private final static String BUILDER_NAME_POSTFIX = "Builder";
@@ -58,37 +60,5 @@ public class DataClassBuilderDescriptor {
                 fields.add((VariableElement) element);
             }
         }
-    }
-
-    public List<ExecutableElement> getMethods() {
-        return methods;
-    }
-
-    public List<VariableElement> getFields() {
-        return fields;
-    }
-
-    public DataClassBuilder getAnnotation() {
-        return annotation;
-    }
-
-    public TypeSpec.Builder getTypeSpecBuilder() {
-        return typeSpecBuilder;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public String getDataClassBuilderName() {
-        return dataClassBuilderName;
-    }
-
-    public ElementKind getElementKind() {
-        return elementKind;
-    }
-
-    public TypeElement getTypeElement() {
-        return typeElement;
     }
 }

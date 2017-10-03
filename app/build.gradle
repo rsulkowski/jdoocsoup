@@ -30,6 +30,10 @@ dependencies {
     annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
     testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
 
+    annotationProcessor 'org.projectlombok:lombok:1.16.18'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.16.18'
+    compileOnly 'org.projectlombok:lombok:1.16.18'
+
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
