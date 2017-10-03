@@ -1,0 +1,57 @@
+apply plugin: 'maven-publish'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+// Create the pom configuration:
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "rsulkowski"
+            name "Ryszard Sułkowski"
+            email "ryszard.sulkowski@gmail.com"
+        }
+    }
+
+    scm {
+        url "https://github.com/rsulkowski/jdoocsoup"
+    }
+}
+
+// Create the publication with the pom configuration:
+publishing {
+    publications {
+        JDoocSoupPublication(MavenPublication) {
+            from components.java
+            groupId 'eu.rsulkowski'
+            artifactId 'jdoocsoup'
+            version '0.1'
+            artifact sourcesJar
+            artifact javadocJar
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Library to support your fight with boilerplate code.')
+                root.appendNode('name', 'JDoocSoup')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
