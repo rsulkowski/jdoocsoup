@@ -53,9 +53,18 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         if (descriptor.getElementKind() == ElementKind.CLASS) {
             for (VariableElement var : descriptor.getFields()) {
 
-                DataClassBuilder.MethodDocs builderMethodDocsAnnotation = var.getAnnotation(DataClassBuilder.MethodDocs.class);
+                if (checkIfFieldForProcessing(var)) {
+                    continue;
+                }
 
-                FieldSpec fieldSpec = FieldSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).addModifiers(Modifier.PRIVATE).build();
+                DataClassBuilder.MethodDocs builderMethodDocsAnnotation = var.getAnnotation(DataClassBuilder.MethodDocs.class);
+                DataClassBuilder.HasDefault hasDefaultAnnotation = var.getAnnotation(DataClassBuilder.HasDefault.class);
+
+                FieldSpec.Builder fieldSpec = FieldSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).addModifiers(Modifier.PRIVATE);
+
+                if (hasDefaultAnnotation != null) {
+                    fieldSpec.initializer(CodeBlock.of("$L", hasDefaultAnnotation.value()));
+                }
 
                 MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(var.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
                         .addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).build())
@@ -67,7 +76,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                     methodSpec.addJavadoc(builderMethodDocsAnnotation.text() + "\n");
                 }
 
-                builderClassSpecBuilder.addField(fieldSpec);
+                builderClassSpecBuilder.addField(fieldSpec.build());
                 builderClassSpecBuilder.addMethod(methodSpec.build());
             }
         }
@@ -75,6 +84,10 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         builderClassSpecBuilder.addMethod(createBuilderMethodSpec());
         builderClassSpecBuilder.addMethod(createBuildMethodSpec());
         builderClassSpecBuilder.addMethod(createPrivateConstructor());
+    }
+
+    private boolean checkIfFieldForProcessing(VariableElement var) {
+        return var.getModifiers().contains(Modifier.FINAL) || var.getModifiers().contains(Modifier.STATIC);
     }
 
     private MethodSpec createPrivateConstructor() {
@@ -103,19 +116,22 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
     private CodeBlock createNewObject() {
         CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
         codeBlockBuilder.add("return new $N(", descriptor.getTypeElement().getSimpleName());
+        StringBuilder stringBuilder = new StringBuilder();
 
         List<VariableElement> elements = descriptor.getFields();
 
         for (int i = 0; i < elements.size(); i++) {
 
             VariableElement variableElement = elements.get(i);
-            if (i < elements.size() - 1) {
-                codeBlockBuilder.add("$N,", variableElement.getSimpleName().toString());
-            } else {
-                codeBlockBuilder.add("$N", variableElement.getSimpleName().toString());
+            if (checkIfFieldForProcessing(variableElement)) {
+                continue;
             }
+
+            stringBuilder.append(String.format("%s,", variableElement.getSimpleName().toString()));
         }
 
+        int last = stringBuilder.lastIndexOf(",");
+        codeBlockBuilder.add(stringBuilder.deleteCharAt(last).toString());
         codeBlockBuilder.add(");\n");
 
         return codeBlockBuilder.build();

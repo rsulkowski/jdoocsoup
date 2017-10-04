@@ -15,31 +15,37 @@ public @interface DataClassBuilder {
      * Describes the name of the Builder.
      * If left empty than the default name of Builder will contain
      * the name of the annotated class + postfix: "Builder".
+     *  @return name
      */
     String name() default "";
 
     /**
      * Contains the JavaDocs of the whole Builder class.
+     *  @return jdocs
      */
     String jdocs() default "";
 
     /**
      * Specifies the name of the factory method to create Builder. By default it is: "builder"
+     *  @return builderMethodName
      */
     String builderMethodName() default "builder";
 
     /**
      * Specifies the name of the terminal method to produce the new data class object. By default it is: "build"
+     *  @return buildMethodName
      */
     String buildMethodName() default "build";
 
     /**
      * Contains the JavaDocs for the builder method.
+     *  @return builderMethodJDocs
      */
     String builderMethodJDocs() default "";
 
     /**
      * Contains the JavaDocs for the build method.
+     * @return buildMethodJDocs
      */
     String buildMethodJDocs() default "";
 
@@ -51,8 +57,22 @@ public @interface DataClassBuilder {
     @interface MethodDocs {
         /**
          * The text of the javadocs which will describe the Builder mutator method.
+         * @return text
          */
         String text() default "";
+    }
+
+    /**
+     * Defines that the field at DataClass has default value and it should be used if not set via builder.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @Target({ElementType.FIELD})
+    @interface HasDefault {
+        /**
+         * Accepts literals.
+         * @return value
+         */
+        String value();
     }
 
 }

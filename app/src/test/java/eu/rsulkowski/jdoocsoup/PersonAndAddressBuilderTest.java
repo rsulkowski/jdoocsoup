@@ -40,7 +40,6 @@ public class PersonAndAddressBuilderTest {
                 .build();
 
         Person person = PersonBuilder.builder()
-                .age(29)
                 .name("Jane")
                 .surname("Surname")
                 .address(address)
@@ -52,6 +51,6 @@ public class PersonAndAddressBuilderTest {
         Assert.assertEquals(20, person.getAddress().getStreetNumber());
         Assert.assertEquals("Jane", person.getName());
         Assert.assertEquals("Surname", person.getSurname());
-        Assert.assertEquals(29, person.getAge());
+        Assert.assertEquals(30, person.getAge());
     }
 }

@@ -26,9 +26,13 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
 
-    implementation 'eu.rsulkowski:jdoocsoup:0.1'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+//    implementation 'eu.rsulkowski:jdoocsoup:0.1'
+//    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+//    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+
+    implementation project(':processor')
+    annotationProcessor project(':processor')
+    testAnnotationProcessor project(':processor')
 
     annotationProcessor 'org.projectlombok:lombok:1.16.18'
     testAnnotationProcessor 'org.projectlombok:lombok:1.16.18'
