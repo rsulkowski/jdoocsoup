@@ -26,6 +26,7 @@ This problem is especially visible with @Builder annotation and this library wan
 Example input POJO class:
 
 ```java
+@Getter
 @DataClassBuilder(
         jdocs = "POJO class which represents the Person.",
         builderMethodJDocs = "Creates the new builder object for Person",
@@ -33,6 +34,7 @@ Example input POJO class:
 public class Person {
 
     @DataClassBuilder.MethodDocs(text = "This method sets the age of the person. Normally from 0 to 130.")
+    @DataClassBuilder.HasDefault("30")
     private int age;
 
     @DataClassBuilder.MethodDocs(text = "This method sets the name of the Person.")
@@ -43,6 +45,15 @@ public class Person {
 
     @DataClassBuilder.MethodDocs(text = "This method sets the address where the person lives.")
     private Address address;
+
+    // Final fields shouldn't be added to builder
+    private final int someFinalField = 2;
+
+    // Static fields shouldn't be added to builder
+    private static int someStaticField = 3;
+
+    // Final static fields shouldn't be added to builder
+    private final static int ANOTHER_FINAL_STATIC_FIELD = 4;
 
     Person(int age, String name, String surname, Address address) {
         this.age = age;
@@ -60,7 +71,7 @@ Generated Builder:
  * POJO class which represents the Person.
  */
 public class PersonBuilder {
-  private int age;
+  private int age = 30;
 
   private String name;
 
@@ -139,9 +150,7 @@ buildscript {
 allprojects {
     repositories {
         // ..
-        maven {
-            url  "https://dl.bintray.com/rsulkowski/jdoocsoup"
-        }
+        jcenter() // latest published version is available on jcenter
     }
 }
 ```
@@ -150,9 +159,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.1'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.1'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.1'
     //..
 }
 ```
