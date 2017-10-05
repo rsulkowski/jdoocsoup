@@ -26,10 +26,10 @@ public @interface DataClassBuilder {
     String jdocs() default "";
 
     /**
-     * Specifies the name of the factory method to create Builder. By default it is: "builder"
+     * Specifies the name of the factory method to create Builder. By default it is: "create"
      *  @return builderMethodName
      */
-    String builderMethodName() default "builder";
+    String builderMethodName() default "create";
 
     /**
      * Specifies the name of the terminal method to produce the new data class object. By default it is: "build"

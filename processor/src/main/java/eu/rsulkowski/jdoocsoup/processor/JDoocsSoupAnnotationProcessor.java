@@ -14,7 +14,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -23,7 +22,6 @@ import eu.rsulkowski.jdoocsoup.processor.handler.BaseAnnotationHandler;
 import eu.rsulkowski.jdoocsoup.processor.handler.DataClassBuilderHandler;
 import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
 
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes({
         "eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder"})
 @AutoService(Processor.class)
@@ -31,6 +29,11 @@ public class JDoocsSoupAnnotationProcessor extends AbstractProcessor implements 
 
     private DataClassBuilderHandler dataClassBuilderHandler;
     private List<Pair<String, TypeSpec>> javaClassesToBeCreated = new ArrayList<>();
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {

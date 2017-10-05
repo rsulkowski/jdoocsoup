@@ -16,7 +16,7 @@ public class PersonAndAddressBuilderTest {
     @Test
     public void createAddressByBuilder() {
         Address address = AddressBuilder
-                .builder()
+                .create()
                 .country("Poland")
                 .city("Warsaw")
                 .street("Dolna")
@@ -32,14 +32,14 @@ public class PersonAndAddressBuilderTest {
     @Test
     public void createPersonByBuilder() {
         Address address = AddressBuilder
-                .builder()
+                .create()
                 .country("Poland")
                 .city("Warsaw")
                 .street("Dolna")
                 .streetNumber(20)
                 .build();
 
-        Person person = PersonBuilder.builder()
+        Person person = PersonBuilder.create()
                 .name("Jane")
                 .surname("Surname")
                 .address(address)
