@@ -13,16 +13,16 @@ import lombok.Getter;
         buildMethodJDocs = "Gather all passed information from AddressBuilder and creates new Address object")
 public class Address {
 
-    @DataClassBuilder.MethodDocs(text = "This method sets on the builder the country in example: Poland")
+    @DataClassBuilder.MethodDocs("This method sets on the builder the country in example: Poland")
     private String country;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets on the builder the city name like: Warsaw")
+    @DataClassBuilder.MethodDocs("This method sets on the builder the city name like: Warsaw")
     private String city;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets on the builder the street name like: Dolna")
+    @DataClassBuilder.MethodDocs("This method sets on the builder the street name like: Dolna")
     private String street;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets on the builder the street number like: 20")
+    @DataClassBuilder.MethodDocs("This method sets on the builder the street number like: 20")
     private int streetNumber;
 
     Address(String country, String city, String street, int streetNumber) {

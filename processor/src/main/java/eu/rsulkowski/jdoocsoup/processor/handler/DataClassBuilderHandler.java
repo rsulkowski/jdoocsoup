@@ -73,7 +73,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                         .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
 
                 if (builderMethodDocsAnnotation != null) {
-                    methodSpec.addJavadoc(builderMethodDocsAnnotation.text() + "\n");
+                    methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
                 }
 
                 builderClassSpecBuilder.addField(fieldSpec.build());

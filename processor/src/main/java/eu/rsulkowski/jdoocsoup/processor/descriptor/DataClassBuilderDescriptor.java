@@ -53,7 +53,18 @@ public class DataClassBuilderDescriptor {
     private void parseAll() {
         typeSpecBuilder.addJavadoc(annotation.jdocs() + "\n");
 
-        for (Element element : typeElement.getEnclosedElements()) {
+        checkElementForMembers(typeElement);
+
+        if (typeElement.getSuperclass() == null) {
+            return;
+        }
+
+        Element superClassElement = processingEnvironment.getTypeUtils().asElement(typeElement.getSuperclass());
+        checkElementForMembers(superClassElement);
+    }
+
+    private void checkElementForMembers(Element rootElement) {
+        for (Element element : rootElement.getEnclosedElements()) {
             if (element.getKind() == ElementKind.METHOD) {
                 methods.add((ExecutableElement) element);
             } else if (element.getKind() == ElementKind.FIELD) {
