@@ -33,17 +33,17 @@ Example input POJO class:
         buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object")
 public class Person {
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the age of the person. Normally from 0 to 130.")
+    @DataClassBuilder.MethodDocs("This method sets the age of the person. Normally from 0 to 130.")
     @DataClassBuilder.HasDefault("30")
     private int age;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the name of the Person.")
+    @DataClassBuilder.MethodDocs("This method sets the name of the Person.")
     private String name;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the surname of the Person.")
+    @DataClassBuilder.MethodDocs("This method sets the surname of the Person.")
     private String surname;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the address where the person lives.")
+    @DataClassBuilder.MethodDocs("This method sets the address where the person lives.")
     private Address address;
 
     // Final fields shouldn't be added to builder
@@ -130,6 +130,97 @@ public class PersonBuilder {
 }
 ```
 
+## Inheritance support
+
+Starting with the version 0.1.3 of the library it is enabled for the builder to look for fields and methods at the base class.
+As an example the simple code bellow:
+
+Base class:
+```java
+abstract class Fruit {
+
+    @DataClassBuilder.MethodDocs("Some javadocs for weight.")
+    protected int weight;
+
+    @DataClassBuilder.MethodDocs("Some javadocs for color.")
+    protected String color;
+}
+```
+
+Subclass:
+```java
+@DataClassBuilder(jdocs = "The type of the Fruit which has a problem with worms.",
+        builderMethodJDocs = "Creates the new builder object for Apple",
+        buildMethodJDocs = "Gathers all passed information from AppleBuilder and the base class and creates new Apple object")
+public class Apple extends Fruit {
+
+    @DataClassBuilder.MethodDocs("Some javadocs for wormName.\n@param wormName - the name of the worm inside the apple\n@return the builder.")
+    private String wormName;
+
+    Apple(String wormName, int weight, String color) {
+        this.wormName = wormName;
+        this.weight = weight;
+        this.color = color;
+    }
+}
+```
+Will produce as an result:
+```java
+/**
+ * The type of the Fruit which has a problem with worms.
+ */
+public class AppleBuilder {
+  private String wormName;
+
+  private int weight;
+
+  private String color;
+
+  private AppleBuilder() {
+  }
+
+  /**
+   * Some javadocs for wormName.
+   * @param wormName - the name of the worm inside the apple
+   * @return the builder.
+   */
+  public AppleBuilder wormName(String wormName) {
+    this.wormName = wormName;
+    return this;
+  }
+
+  /**
+   * Some javadocs for weight.
+   */
+  public AppleBuilder weight(int weight) {
+    this.weight = weight;
+    return this;
+  }
+
+  /**
+   * Some javadocs for color.
+   */
+  public AppleBuilder color(String color) {
+    this.color = color;
+    return this;
+  }
+
+  /**
+   * Creates the new builder object for Apple
+   */
+  public static AppleBuilder create() {
+    return new AppleBuilder();
+  }
+
+  /**
+   * Gathers all passed information from AppleBuilder and the base class and creates new Apple object
+   */
+  public Apple build() {
+    return new Apple(wormName,weight,color);
+  }
+}
+```
+
 ## Configuration
 
 To start you have to do following steps:
@@ -159,9 +250,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.2'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.2'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.2'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.3'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.3'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.3'
     //..
 }
 ```
