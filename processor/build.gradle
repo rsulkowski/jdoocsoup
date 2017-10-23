@@ -26,10 +26,10 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/rsulkowski/jdoocsoup.git'
         version {
-            name = '0.1.2'
-            desc = 'JDoocSoup v0.1.2'
+            name = jdoocsoupLibVersion
+            desc = 'JDoocSoup v' + jdoocsoupLibVersion
             released  = new Date()
-            vcsTag = '0.1.2'
+            vcsTag = jdoocsoupLibVersion
         }
     }
     publications = ['JDoocSoupPublication']
