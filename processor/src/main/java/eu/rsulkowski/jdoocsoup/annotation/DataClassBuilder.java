@@ -57,9 +57,9 @@ public @interface DataClassBuilder {
     @interface MethodDocs {
         /**
          * The text of the javadocs which will describe the Builder mutator method.
-         * @return text
+         * @return the value
          */
-        String text() default "";
+        String value() default "";
     }
 
     /**

@@ -13,17 +13,17 @@ import lombok.Getter;
         buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object")
 public class Person {
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the age of the person. Normally from 0 to 130.")
+    @DataClassBuilder.MethodDocs("This method sets the age of the person. Normally from 0 to 130.")
     @DataClassBuilder.HasDefault("30")
     private int age;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the name of the Person.")
+    @DataClassBuilder.MethodDocs("This method sets the name of the Person.")
     private String name;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the surname of the Person.")
+    @DataClassBuilder.MethodDocs("This method sets the surname of the Person.")
     private String surname;
 
-    @DataClassBuilder.MethodDocs(text = "This method sets the address where the person lives.")
+    @DataClassBuilder.MethodDocs("This method sets the address where the person lives.")
     private Address address;
 
     // Final fields shouldn't be added to builder
