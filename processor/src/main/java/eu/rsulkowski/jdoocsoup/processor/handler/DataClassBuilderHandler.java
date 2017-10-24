@@ -105,10 +105,16 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
 
     private MethodSpec createBuildMethodSpec() {
 
+        ClassName forcedReturnType = ClassName.get(descriptor.getPackageName(), descriptor.getTypeElement().getSimpleName().toString());
+
+        if (!ClassName.get(descriptor.getBuildMethodReturnType()).equals(ClassName.get(Class.class))) {
+            forcedReturnType = ClassName.get(descriptor.getBuildMethodReturnType());
+        }
+
         return MethodSpec.methodBuilder(descriptor.getAnnotation().buildMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc(descriptor.getAnnotation().buildMethodJDocs() + "\n")
-                .returns(ClassName.get(descriptor.getPackageName(), descriptor.getTypeElement().getSimpleName().toString()))
+                .returns(forcedReturnType)
                 .addCode(createNewObject())
                 .build();
     }

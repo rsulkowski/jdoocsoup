@@ -38,8 +38,14 @@ public @interface DataClassBuilder {
     String buildMethodName() default "build";
 
     /**
+     * Specifies the type which is returned by the build method instead of the built type. Typically, it might be an interface.
+     * @return buildMethodReturnType
+     */
+    Class buildMethodReturnType() default Class.class;
+
+    /**
      * Contains the JavaDocs for the builder method.
-     *  @return builderMethodJDocs
+     * @return builderMethodJDocs
      */
     String builderMethodJDocs() default "";
 

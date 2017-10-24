@@ -1,7 +1,10 @@
 package eu.rsulkowski.jdoocsoup.processor.descriptor;
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +15,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
@@ -38,9 +43,16 @@ public class DataClassBuilderDescriptor {
     private final TypeSpec.Builder typeSpecBuilder;
     private final List<ExecutableElement> methods = new ArrayList<>();
     private final List<VariableElement> fields = new ArrayList<>();
+    private TypeElement buildMethodReturnType;
 
     public DataClassBuilderDescriptor(ProcessingEnvironment env, TypeElement element) {
         annotation = element.getAnnotation(DataClassBuilder.class);
+        try {
+            annotation.buildMethodReturnType();
+        } catch (MirroredTypeException mte) {
+            buildMethodReturnType = (TypeElement) env.getTypeUtils().asElement(mte.getTypeMirror());
+        }
+
         dataClassBuilderName = annotation.name().isEmpty() ? element.getSimpleName() + BUILDER_NAME_POSTFIX : annotation.name();
         packageName = ElementsUtils.parsePackageName(env, element);
         this.processingEnvironment = env;

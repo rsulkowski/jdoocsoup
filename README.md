@@ -220,6 +220,76 @@ public class AppleBuilder {
   }
 }
 ```
+## Builder build method return type
+
+Since version **0.1.5** It is possible to return different type by the terminal 'build' method
+by using buildMethodReturnType param of the @DataClassBuilder annotation.
+
+Data class:
+
+```java
+@DataClassBuilder(buildMethodReturnType = INote.class)
+public class Note implements INote {
+
+    private int pages;
+    private String title;
+
+    Note(int pages, String title) {
+        this.pages = pages;
+        this.title = title;
+    }
+}
+```
+
+Interface implemented by Data class:
+
+```java
+public interface INote {
+}
+
+```
+
+Generated builder:
+
+```java
+/**
+ *
+ */
+public class NoteBuilder {
+  private int pages;
+
+  private String title;
+
+  private NoteBuilder() {
+  }
+
+  public NoteBuilder pages(int pages) {
+    this.pages = pages;
+    return this;
+  }
+
+  public NoteBuilder title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   *
+   */
+  public static NoteBuilder create() {
+    return new NoteBuilder();
+  }
+
+  /**
+   *
+   */
+  public INote build() {
+    return new Note(pages,title);
+  }
+}
+
+```
+
 
 ## Configuration
 
@@ -250,9 +320,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.4'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.4'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.4'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.5'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.5'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.5'
     //..
 }
 ```
