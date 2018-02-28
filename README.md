@@ -290,6 +290,32 @@ public class NoteBuilder {
 
 ```
 
+## @DataClassBuilder.Ignored annotation
+
+Since the version 0.1.6 it is possible to ignore fields explicitly from being used for generated builder. 
+It is done via @DataClassBuilder.Ignored annotation:
+
+```java
+@Getter
+@DataClassBuilder(jdocs = "The type of the Fruit which has a problem with worms.",
+        builderMethodJDocs = "Creates the new builder object for Apple",
+        buildMethodJDocs = "Gathers all passed information from AppleBuilder and the base class and creates new Apple object")
+public class Apple extends Fruit {
+
+    @DataClassBuilder.MethodDocs("Some javadocs for wormName.\n@param wormName - the name of the worm inside the apple\n@return the builder.")
+    private String wormName;
+
+    @DataClassBuilder.Ignored
+    private String tagToBeIgnored;
+
+    Apple(String wormName, int weight, String color) {
+        this.wormName = wormName;
+        this.weight = weight;
+        this.color = color;
+    }
+}
+
+```
 
 ## Configuration
 
@@ -320,9 +346,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.5'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.5'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.5'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.6'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.6'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.6'
     //..
 }
 ```
