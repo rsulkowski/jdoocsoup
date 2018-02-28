@@ -81,4 +81,12 @@ public @interface DataClassBuilder {
         String value();
     }
 
+    /**
+     * Defines that the field at DataClass has default value and it should be used if not set via builder.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @Target({ElementType.FIELD})
+    @interface Ignored {
+    }
+
 }

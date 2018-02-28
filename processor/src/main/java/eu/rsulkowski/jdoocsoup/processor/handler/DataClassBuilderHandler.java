@@ -51,24 +51,24 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
 
     private void parseDataFromDescriptor() {
         if (descriptor.getElementKind() == ElementKind.CLASS) {
-            for (VariableElement var : descriptor.getFields()) {
+            for (VariableElement variableElement : descriptor.getFields()) {
 
-                if (checkIfFieldForProcessing(var)) {
+                if (checkIfFieldForProcessing(variableElement)) {
                     continue;
                 }
 
-                DataClassBuilder.MethodDocs builderMethodDocsAnnotation = var.getAnnotation(DataClassBuilder.MethodDocs.class);
-                DataClassBuilder.HasDefault hasDefaultAnnotation = var.getAnnotation(DataClassBuilder.HasDefault.class);
+                DataClassBuilder.MethodDocs builderMethodDocsAnnotation = variableElement.getAnnotation(DataClassBuilder.MethodDocs.class);
+                DataClassBuilder.HasDefault hasDefaultAnnotation = variableElement.getAnnotation(DataClassBuilder.HasDefault.class);
 
-                FieldSpec.Builder fieldSpec = FieldSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).addModifiers(Modifier.PRIVATE);
+                FieldSpec.Builder fieldSpec = FieldSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).addModifiers(Modifier.PRIVATE);
 
                 if (hasDefaultAnnotation != null) {
                     fieldSpec.initializer(CodeBlock.of("$L", hasDefaultAnnotation.value()));
                 }
 
-                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(var.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
-                        .addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString()).build())
-                        .addStatement("this.$N = $N", var.getSimpleName(), var.getSimpleName())
+                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(variableElement.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
+                        .addParameter(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build())
+                        .addStatement("this.$N = $N", variableElement.getSimpleName(), variableElement.getSimpleName())
                         .addStatement("return this")
                         .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
 
@@ -86,8 +86,8 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         builderClassSpecBuilder.addMethod(createPrivateConstructor());
     }
 
-    private boolean checkIfFieldForProcessing(VariableElement var) {
-        return var.getModifiers().contains(Modifier.FINAL) || var.getModifiers().contains(Modifier.STATIC);
+    private boolean checkIfFieldForProcessing(VariableElement variableElement) {
+        return variableElement.getModifiers().contains(Modifier.FINAL) || variableElement.getModifiers().contains(Modifier.STATIC) || variableElement.getAnnotation(DataClassBuilder.Ignored.class) != null;
     }
 
     private MethodSpec createPrivateConstructor() {
