@@ -40,7 +40,7 @@ public class PersonAndAddressBuilderTest {
                 .build();
 
         Person person = PersonBuilder.create("Jane", "Surname")
-                .address(address)
+                .withAddress(address)
                 .build();
 
         Assert.assertEquals("Poland", person.getAddress().getCountry());
