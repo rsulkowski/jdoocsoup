@@ -20,6 +20,15 @@ public @interface DataClassBuilder {
     String name() default "";
 
     /**
+     * Sets the prefix for the setter methods of the builder. In example for the field 'String name'
+     * the default setter signature is: 'Builder name(String name){}' but if we set the prefix 'with' it will be:
+     * 'Builder withName(String name);'
+     *
+     * @return the prefix for builder setters
+     */
+    String setterPrefix() default "";
+
+    /**
      * Contains the JavaDocs of the whole Builder class.
      *  @return jdocs
      */

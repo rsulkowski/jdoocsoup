@@ -30,7 +30,8 @@ Example input POJO class:
 @DataClassBuilder(
         jdocs = "POJO class which represents the Person.",
         builderMethodJDocs = "Creates the new builder object for Person\n@param name it is the name of the person.\n@param surname it is the surname of the person",
-        buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object")
+        buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object",
+        setterPrefix = "with")
 public class Person {
 
     @DataClassBuilder.MethodDocs("This method sets the age of the person. Normally from 0 to 130.")
@@ -49,6 +50,8 @@ public class Person {
     @DataClassBuilder.MethodDocs("This method sets the address where the person lives.")
     private Address address;
 
+    private String someLongStringAddress;
+
     // Final fields shouldn't be added to builder
     private final int someFinalField = 2;
 
@@ -58,11 +61,12 @@ public class Person {
     // Final static fields shouldn't be added to builder
     private final static int ANOTHER_FINAL_STATIC_FIELD = 4;
 
-    Person(int age, String name, String surname, Address address) {
+    Person(int age, String name, String surname, Address address, String someLongStringAddress) {
         this.age = age;
         this.name = name;
         this.surname = surname;
         this.address = address;
+        this.someLongStringAddress = someLongStringAddress;
     }
 }
 ```
@@ -82,6 +86,8 @@ public class PersonBuilder {
 
   private Address address;
 
+  private String someLongStringAddress;
+
   private PersonBuilder(String name, String surname) {
     this.name=name;
     this.surname=surname;
@@ -90,7 +96,7 @@ public class PersonBuilder {
   /**
    * This method sets the age of the person. Normally from 0 to 130.
    */
-  public PersonBuilder age(int age) {
+  public PersonBuilder withAge(int age) {
     this.age = age;
     return this;
   }
@@ -98,8 +104,13 @@ public class PersonBuilder {
   /**
    * This method sets the address where the person lives.
    */
-  public PersonBuilder address(Address address) {
+  public PersonBuilder withAddress(Address address) {
     this.address = address;
+    return this;
+  }
+
+  public PersonBuilder withSomeLongStringAddress(String someLongStringAddress) {
+    this.someLongStringAddress = someLongStringAddress;
     return this;
   }
 
@@ -116,7 +127,7 @@ public class PersonBuilder {
    * Gather all passed information from PersonBuilder and creates new Person object
    */
   public Person build() {
-    return new Person(age,name,surname,address);
+    return new Person(age,name,surname,address,someLongStringAddress);
   }
 }
 ```
@@ -331,6 +342,27 @@ Will result with this in Data Class's Builder:
   }
 ```
 
+## @DataClassBuilder optional params
+### Since 0.1.8: setterPrefix
+It allows to add the prefix to the name of the generated setter methods of Data Class Builder:
+
+*In example:*
+
+When you will use:
+
+```java
+@DataClassBuilder(setterPrefix = "with")
+```
+
+The result for 'someLongStringAddress' field of Person will be:
+
+```java
+  public PersonBuilder withSomeLongStringAddress(String someLongStringAddress) {
+    this.someLongStringAddress = someLongStringAddress;
+    return this;
+  }
+```
+
 
 ## Configuration
 
@@ -361,9 +393,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.7'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.7'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.7'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.8'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.8'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.8'
     //..
 }
 ```

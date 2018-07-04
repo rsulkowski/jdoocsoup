@@ -5,6 +5,7 @@ import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.descriptor.DataClassBuilderDescriptor;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -43,6 +44,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         List<VariableElement> requiredElements = new ArrayList<>();
 
         if (descriptor.getElementKind() == ElementKind.CLASS) {
+
             for (VariableElement variableElement : descriptor.getFields()) {
 
                 if (checkIfFieldForProcessing(variableElement)) {
@@ -60,15 +62,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                 }
 
                 if (isRequired == null) {
-                    MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(variableElement.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
-                            .addParameter(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build())
-                            .addStatement("this.$N = $N", variableElement.getSimpleName(), variableElement.getSimpleName())
-                            .addStatement("return this")
-                            .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
-
-                    if (builderMethodDocsAnnotation != null) {
-                        methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
-                    }
+                    MethodSpec.Builder methodSpec = createBuilderSetterMethodFor(variableElement, builderMethodDocsAnnotation);
                     builderClassSpecBuilder.addMethod(methodSpec.build());
                 } else {
                     requiredElements.add(variableElement);
@@ -82,6 +76,26 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         builderClassSpecBuilder.addMethod(createBuilderMethodSpec(requiredParams));
         builderClassSpecBuilder.addMethod(createBuildMethodSpec());
         builderClassSpecBuilder.addMethod(createPrivateConstructor(requiredParams));
+    }
+
+    private MethodSpec.Builder createBuilderSetterMethodFor(VariableElement variableElement, DataClassBuilder.MethodDocs builderMethodDocsAnnotation) {
+
+        String setterMethodName = variableElement.getSimpleName().toString();
+
+        if (!descriptor.getSetterPrefix().isEmpty()) {
+            setterMethodName = descriptor.getSetterPrefix() + StringUtils.capitalize(setterMethodName);
+        }
+
+        MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(setterMethodName).addModifiers(Modifier.PUBLIC)
+                .addParameter(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build())
+                .addStatement("this.$N = $N", variableElement.getSimpleName(), variableElement.getSimpleName())
+                .addStatement("return this")
+                .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
+
+        if (builderMethodDocsAnnotation != null) {
+            methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
+        }
+        return methodSpec;
     }
 
     private List<ParameterSpec> parseRequiredParams(List<VariableElement> requiredElements) {

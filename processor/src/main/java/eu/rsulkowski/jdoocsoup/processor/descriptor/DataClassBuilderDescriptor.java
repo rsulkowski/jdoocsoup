@@ -1,31 +1,19 @@
 package eu.rsulkowski.jdoocsoup.processor.descriptor;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.type.TypeMirror;
-
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 import lombok.Getter;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.*;
+import javax.lang.model.type.MirroredTypeException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by rsulkowski on 10/2/17.
  */
-
 /**
  * Contains the description of the DataClassBuilder such as: package name, element kind etc.
  */
@@ -37,6 +25,7 @@ public class DataClassBuilderDescriptor {
     private final DataClassBuilder annotation;
     private final String dataClassBuilderName;
     private final String packageName;
+    private final String setterPrefix;
     private final ProcessingEnvironment processingEnvironment;
     private final TypeElement typeElement;
     private final ElementKind elementKind;
@@ -53,8 +42,9 @@ public class DataClassBuilderDescriptor {
             buildMethodReturnType = (TypeElement) env.getTypeUtils().asElement(mte.getTypeMirror());
         }
 
-        dataClassBuilderName = annotation.name().isEmpty() ? element.getSimpleName() + BUILDER_NAME_POSTFIX : annotation.name();
-        packageName = ElementsUtils.parsePackageName(env, element);
+        this.dataClassBuilderName = annotation.name().isEmpty() ? element.getSimpleName() + BUILDER_NAME_POSTFIX : annotation.name();
+        this.setterPrefix = annotation.setterPrefix();
+        this.packageName = ElementsUtils.parsePackageName(env, element);
         this.processingEnvironment = env;
         this.typeElement = element;
         this.elementKind = element.getKind();
