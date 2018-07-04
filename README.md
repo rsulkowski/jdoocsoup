@@ -29,7 +29,7 @@ Example input POJO class:
 @Getter
 @DataClassBuilder(
         jdocs = "POJO class which represents the Person.",
-        builderMethodJDocs = "Creates the new builder object for Person",
+        builderMethodJDocs = "Creates the new builder object for Person\n@param name it is the name of the person.\n@param surname it is the surname of the person",
         buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object")
 public class Person {
 
@@ -38,9 +38,12 @@ public class Person {
     private int age;
 
     @DataClassBuilder.MethodDocs("This method sets the name of the Person.")
+    @DataClassBuilder.HasDefault("\"John\"")
+    @DataClassBuilder.Required
     private String name;
 
     @DataClassBuilder.MethodDocs("This method sets the surname of the Person.")
+    @DataClassBuilder.Required
     private String surname;
 
     @DataClassBuilder.MethodDocs("This method sets the address where the person lives.")
@@ -73,13 +76,15 @@ Generated Builder:
 public class PersonBuilder {
   private int age = 30;
 
-  private String name;
+  private String name = "John";
 
   private String surname;
 
   private Address address;
 
-  private PersonBuilder() {
+  private PersonBuilder(String name, String surname) {
+    this.name=name;
+    this.surname=surname;
   }
 
   /**
@@ -87,22 +92,6 @@ public class PersonBuilder {
    */
   public PersonBuilder age(int age) {
     this.age = age;
-    return this;
-  }
-
-  /**
-   * This method sets the name of the Person.
-   */
-  public PersonBuilder name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * This method sets the surname of the Person.
-   */
-  public PersonBuilder surname(String surname) {
-    this.surname = surname;
     return this;
   }
 
@@ -116,9 +105,11 @@ public class PersonBuilder {
 
   /**
    * Creates the new builder object for Person
+   * @param name it is the name of the person.
+   * @param surname it is the surname of the person
    */
-  public static PersonBuilder builder() {
-    return new PersonBuilder();
+  public static PersonBuilder create(String name, String surname) {
+    return new PersonBuilder(name,surname);
   }
 
   /**
@@ -346,9 +337,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.6'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.6'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.6'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.7'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.7'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.7'
     //..
 }
 ```

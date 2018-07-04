@@ -1,28 +1,17 @@
 package eu.rsulkowski.jdoocsoup.processor.handler;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-
-import java.util.List;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-
+import com.squareup.javapoet.*;
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.descriptor.DataClassBuilderDescriptor;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 import eu.rsulkowski.jdoocsoup.processor.utils.Pair;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by rsulkowski on 29/09/2017.
@@ -50,6 +39,9 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
     }
 
     private void parseDataFromDescriptor() {
+
+        List<VariableElement> requiredElements = new ArrayList<>();
+
         if (descriptor.getElementKind() == ElementKind.CLASS) {
             for (VariableElement variableElement : descriptor.getFields()) {
 
@@ -59,6 +51,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
 
                 DataClassBuilder.MethodDocs builderMethodDocsAnnotation = variableElement.getAnnotation(DataClassBuilder.MethodDocs.class);
                 DataClassBuilder.HasDefault hasDefaultAnnotation = variableElement.getAnnotation(DataClassBuilder.HasDefault.class);
+                DataClassBuilder.Required isRequired = variableElement.getAnnotation(DataClassBuilder.Required.class);
 
                 FieldSpec.Builder fieldSpec = FieldSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).addModifiers(Modifier.PRIVATE);
 
@@ -66,45 +59,96 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                     fieldSpec.initializer(CodeBlock.of("$L", hasDefaultAnnotation.value()));
                 }
 
-                MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(variableElement.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
-                        .addParameter(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build())
-                        .addStatement("this.$N = $N", variableElement.getSimpleName(), variableElement.getSimpleName())
-                        .addStatement("return this")
-                        .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
+                if (isRequired == null) {
+                    MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(variableElement.getSimpleName().toString()).addModifiers(Modifier.PUBLIC)
+                            .addParameter(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build())
+                            .addStatement("this.$N = $N", variableElement.getSimpleName(), variableElement.getSimpleName())
+                            .addStatement("return this")
+                            .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
 
-                if (builderMethodDocsAnnotation != null) {
-                    methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
+                    if (builderMethodDocsAnnotation != null) {
+                        methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
+                    }
+                    builderClassSpecBuilder.addMethod(methodSpec.build());
+                } else {
+                    requiredElements.add(variableElement);
                 }
-
                 builderClassSpecBuilder.addField(fieldSpec.build());
-                builderClassSpecBuilder.addMethod(methodSpec.build());
             }
         }
 
-        builderClassSpecBuilder.addMethod(createBuilderMethodSpec());
+        List<ParameterSpec> requiredParams = parseRequiredParams(requiredElements);
+
+        builderClassSpecBuilder.addMethod(createBuilderMethodSpec(requiredParams));
         builderClassSpecBuilder.addMethod(createBuildMethodSpec());
-        builderClassSpecBuilder.addMethod(createPrivateConstructor());
+        builderClassSpecBuilder.addMethod(createPrivateConstructor(requiredParams));
+    }
+
+    private List<ParameterSpec> parseRequiredParams(List<VariableElement> requiredElements) {
+        List<ParameterSpec> requiredParams = new ArrayList<>();
+
+        for (VariableElement variableElement : requiredElements) {
+            requiredParams.add(ParameterSpec.builder(TypeName.get(variableElement.asType()), variableElement.getSimpleName().toString()).build());
+        }
+
+        return requiredParams;
     }
 
     private boolean checkIfFieldForProcessing(VariableElement variableElement) {
         return variableElement.getModifiers().contains(Modifier.FINAL) || variableElement.getModifiers().contains(Modifier.STATIC) || variableElement.getAnnotation(DataClassBuilder.Ignored.class) != null;
     }
 
-    private MethodSpec createPrivateConstructor() {
-        return MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE).build();
-    }
-
-    private MethodSpec createBuilderMethodSpec() {
-        return MethodSpec.methodBuilder(descriptor.getAnnotation().builderMethodName())
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addJavadoc(descriptor.getAnnotation().builderMethodJDocs() + "\n")
-                .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()))
-                .addStatement("return new " + descriptor.getDataClassBuilderName() + "()")
+    private MethodSpec createPrivateConstructor(List<ParameterSpec> requiredElements) {
+        return MethodSpec.constructorBuilder()
+                .addParameters(requiredElements)
+                .addCode(assignRequiredFields(requiredElements))
+                .addModifiers(Modifier.PRIVATE)
                 .build();
     }
 
-    private MethodSpec createBuildMethodSpec() {
+    private String assignRequiredFields(List<ParameterSpec> requiredElements) {
+        if (requiredElements.isEmpty()) {
+            return "";
+        }
 
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<requiredElements.size(); i++) {
+            sb.append("this.").append(requiredElements.get(i).name)
+                    .append("=").append(requiredElements.get(i).name)
+                    .append(";\n");
+        }
+        return sb.toString();
+    }
+
+    private MethodSpec createBuilderMethodSpec(List<ParameterSpec> requiredElements) {
+        return MethodSpec.methodBuilder(descriptor.getAnnotation().builderMethodName())
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addJavadoc(descriptor.getAnnotation().builderMethodJDocs() + "\n")
+                .addParameters(requiredElements)
+                .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()))
+                .addStatement("return new " + descriptor.getDataClassBuilderName() + getRequiredParamsString(requiredElements))
+                .build();
+    }
+
+    private String getRequiredParamsString(List<ParameterSpec> requiredElements) {
+        if (requiredElements.isEmpty()) {
+            return "()";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        for (int i = 0; i < requiredElements.size(); i++) {
+            if (i == requiredElements.size() - 1) {
+                sb.append(requiredElements.get(i).name);
+            } else {
+                sb.append(requiredElements.get(i).name).append(",");
+            }
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    private MethodSpec createBuildMethodSpec() {
         ClassName forcedReturnType = ClassName.get(descriptor.getPackageName(), descriptor.getTypeElement().getSimpleName().toString());
 
         if (!ClassName.get(descriptor.getBuildMethodReturnType()).equals(ClassName.get(Class.class))) {

@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @DataClassBuilder(
         jdocs = "POJO class which represents the Person.",
-        builderMethodJDocs = "Creates the new builder object for Person",
+        builderMethodJDocs = "Creates the new builder object for Person\n@param name it is the name of the person.\n@param surname it is the surname of the person",
         buildMethodJDocs = "Gather all passed information from PersonBuilder and creates new Person object")
 public class Person {
 
@@ -18,9 +18,12 @@ public class Person {
     private int age;
 
     @DataClassBuilder.MethodDocs("This method sets the name of the Person.")
+    @DataClassBuilder.HasDefault("\"John\"")
+    @DataClassBuilder.Required
     private String name;
 
     @DataClassBuilder.MethodDocs("This method sets the surname of the Person.")
+    @DataClassBuilder.Required
     private String surname;
 
     @DataClassBuilder.MethodDocs("This method sets the address where the person lives.")

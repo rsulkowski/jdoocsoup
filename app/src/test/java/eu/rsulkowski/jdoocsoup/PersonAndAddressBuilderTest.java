@@ -39,9 +39,7 @@ public class PersonAndAddressBuilderTest {
                 .streetNumber(20)
                 .build();
 
-        Person person = PersonBuilder.create()
-                .name("Jane")
-                .surname("Surname")
+        Person person = PersonBuilder.create("Jane", "Surname")
                 .address(address)
                 .build();
 

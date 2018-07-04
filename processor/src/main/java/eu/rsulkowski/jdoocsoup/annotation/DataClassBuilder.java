@@ -89,4 +89,12 @@ public @interface DataClassBuilder {
     @interface Ignored {
     }
 
+    /**
+     * Defines that the field at DataClass is required and has to appear in build() method of builder.
+     */
+    @Retention(RetentionPolicy.SOURCE)
+    @Target({ElementType.FIELD})
+    @interface Required {
+    }
+
 }
