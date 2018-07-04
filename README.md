@@ -308,6 +308,30 @@ public class Apple extends Fruit {
 
 ```
 
+## @DataClassBuilder.Required annotation
+
+Since the version 0.1.7 it is possible to mark fields in the Data Class as required. If such field will be marked as required,
+the method to create(..) the builder will also force setup of those fields:
+
+Specifying fields like this in Data Class:
+
+```java
+    @DataClassBuilder.Required
+    private String name;
+
+    @DataClassBuilder.Required
+    private String surname;
+```
+
+Will result with this in Data Class's Builder:
+
+```java
+  public static PersonBuilder create(String name, String surname) {
+    return new PersonBuilder(name,surname);
+  }
+```
+
+
 ## Configuration
 
 To start you have to do following steps:
