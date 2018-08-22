@@ -95,6 +95,12 @@ public class DataClassBuilderDescriptor {
     }
 
     private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+        if (annotationMirror == null){
+            return null;
+        }
+        if (annotationMirror.getElementValues() == null){
+            return null;
+        }
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
             if (entry.getKey().getSimpleName().toString().equals(key)) {
 
