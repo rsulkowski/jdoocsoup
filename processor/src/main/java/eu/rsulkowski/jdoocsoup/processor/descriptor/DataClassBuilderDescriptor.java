@@ -95,6 +95,7 @@ public class DataClassBuilderDescriptor {
     }
 
     private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+
         if (annotationMirror == null){
             return null;
         }
