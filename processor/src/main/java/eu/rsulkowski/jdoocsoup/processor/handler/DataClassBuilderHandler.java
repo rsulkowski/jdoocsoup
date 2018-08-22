@@ -194,7 +194,11 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         }
 
         int last = stringBuilder.lastIndexOf(",");
-        codeBlockBuilder.add(stringBuilder.deleteCharAt(last).toString());
+        if (last == -1){
+            codeBlockBuilder.add(stringBuilder.toString());
+        }else {
+            codeBlockBuilder.add(stringBuilder.deleteCharAt(last).toString());
+        }
         codeBlockBuilder.add(");\n");
 
         return codeBlockBuilder.build();
