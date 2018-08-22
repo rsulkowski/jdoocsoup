@@ -393,9 +393,9 @@ allprojects {
 ```groovy
 dependencies {
     // ..
-    implementation 'eu.rsulkowski:jdoocsoup:0.1.10'
-    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.10'
-    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.10'
+    implementation 'eu.rsulkowski:jdoocsoup:0.1.11'
+    annotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.11'
+    testAnnotationProcessor 'eu.rsulkowski:jdoocsoup:0.1.11'
     //..
 }
 ```
