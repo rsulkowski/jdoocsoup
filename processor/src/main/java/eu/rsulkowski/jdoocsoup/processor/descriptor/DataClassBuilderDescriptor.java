@@ -1,6 +1,9 @@
 package eu.rsulkowski.jdoocsoup.processor.descriptor;
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 import lombok.Getter;
@@ -48,7 +51,12 @@ public class DataClassBuilderDescriptor {
         this.processingEnvironment = env;
         this.typeElement = element;
         this.elementKind = element.getKind();
-        this.typeSpecBuilder = TypeSpec.classBuilder(dataClassBuilderName).addModifiers(Modifier.PUBLIC);
+        this.typeSpecBuilder = TypeSpec.classBuilder(dataClassBuilderName);
+        for (String superInterface : annotation.implementInterfaces()){
+            TypeName superI = ClassName.bestGuess(superInterface);
+            typeSpecBuilder.addSuperinterface(superI);
+        }
+        typeSpecBuilder.addModifiers(Modifier.PUBLIC);
         parseAll();
     }
 
