@@ -65,6 +65,13 @@ public @interface DataClassBuilder {
     String buildMethodJDocs() default "";
 
     /**
+     * Contains the JavaDocs for the build method.
+     * @return buildMethodJDocs
+     */
+    Class[] implementInterfaces() default {};
+
+
+    /**
      * Defines the annotation which adds javadocs for Builder mutator methods.
      */
     @Retention(RetentionPolicy.SOURCE)

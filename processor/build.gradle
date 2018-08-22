@@ -6,7 +6,7 @@ dependencies {
     implementation 'com.squareup:javapoet:1.9.0'
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
     implementation 'org.apache.commons:commons-lang3:3.7'
-
+    compileOnly files("${System.getenv('JAVA_HOME')}/lib/tools.jar")
     compileOnly 'org.projectlombok:lombok:1.16.18'
     
     testImplementation 'junit:junit:4.12'
