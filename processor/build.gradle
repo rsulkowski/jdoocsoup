@@ -24,7 +24,7 @@ bintray {
     pkg {
         repo = 'jdoocsoup'
         name = 'jdoocsoup'
-        userOrg = 'rsulkowski'
+        userOrg = 'jdoocsoupteam'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/rsulkowski/jdoocsoup.git'
         version {

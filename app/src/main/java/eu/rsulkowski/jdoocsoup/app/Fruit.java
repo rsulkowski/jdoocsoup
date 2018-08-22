@@ -3,14 +3,14 @@ package eu.rsulkowski.jdoocsoup.app;
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import lombok.Getter;
 
-/**
- * Created by rsulkowski on 2017-10-23.
- */
 @Getter
-abstract class Fruit  {
+public abstract class Fruit extends Size {
 
     @DataClassBuilder.MethodDocs("Some javadocs for weight.")
-    protected int weight;
+    protected Integer weight;
 
     protected String color;
+
+    @DataClassBuilder.Ignored
+    protected String tagToBeIgnored;
 }

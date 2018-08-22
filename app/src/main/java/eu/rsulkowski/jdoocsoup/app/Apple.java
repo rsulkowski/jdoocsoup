@@ -19,13 +19,10 @@ public class Apple extends Fruit {
     @DataClassBuilder.MethodDocs("Some javadocs for wormName.\n@param wormName - the name of the worm inside the apple\n@return the builder.")
     private String wormName;
 
-    @DataClassBuilder.Ignored
-    private String tagToBeIgnored;
-
-    Apple(String wormName, int weight, String color) {
-
+    Apple(String wormName, Integer weight, String color,String sizeKg) {
         this.wormName = wormName;
         this.weight = weight;
         this.color = color;
+        this.sizeKg = sizeKg;
     }
 }

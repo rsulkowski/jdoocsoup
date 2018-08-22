@@ -183,7 +183,6 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         StringBuilder stringBuilder = new StringBuilder();
 
         List<VariableElement> elements = descriptor.getFields();
-
         for (int i = 0; i < elements.size(); i++) {
 
             VariableElement variableElement = elements.get(i);
