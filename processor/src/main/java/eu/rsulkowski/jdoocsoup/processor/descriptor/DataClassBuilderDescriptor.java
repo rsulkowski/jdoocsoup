@@ -19,6 +19,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
@@ -121,13 +122,16 @@ public class DataClassBuilderDescriptor {
         typeSpecBuilder.addJavadoc(annotation.jdocs() + "\n");
 
         checkElementForMembers(typeElement);
-
-        if (typeElement.getSuperclass() == null) {
-            return;
+        TypeMirror superElement = typeElement.getSuperclass();
+        while (superElement!=null){
+            Element superClassElement = processingEnvironment.getTypeUtils().asElement(superElement);
+            if (superClassElement!=null) {
+                checkElementForMembers(superClassElement);
+                superElement = processingEnvironment.getElementUtils().getTypeElement(superClassElement.asType().toString()).getSuperclass();
+            }else{
+                superElement = null;
+            }
         }
-
-        Element superClassElement = processingEnvironment.getTypeUtils().asElement(typeElement.getSuperclass());
-        checkElementForMembers(superClassElement);
     }
 
     private void checkElementForMembers(Element rootElement) {
@@ -137,6 +141,7 @@ public class DataClassBuilderDescriptor {
             } else if (element.getKind() == ElementKind.FIELD) {
                 fields.add((VariableElement) element);
             }
+
         }
     }
 }

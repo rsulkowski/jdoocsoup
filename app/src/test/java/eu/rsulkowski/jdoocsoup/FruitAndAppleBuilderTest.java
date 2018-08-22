@@ -20,10 +20,11 @@ public class FruitAndAppleBuilderTest {
                 .color("Green")
                 .weight(2)
                 .build();
-
+        apple.getSizeKg();
         Assert.assertEquals("Teddy", apple.getWormName());
         Assert.assertEquals("Green", apple.getColor());
-        Assert.assertEquals(2, apple.getWeight());
+        apple.getWeight().toString();
+
     }
 
 }
