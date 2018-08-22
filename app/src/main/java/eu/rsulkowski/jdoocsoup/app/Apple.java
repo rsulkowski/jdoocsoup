@@ -1,5 +1,7 @@
 package eu.rsulkowski.jdoocsoup.app;
 
+import java.io.Serializable;
+
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import lombok.Getter;
 
@@ -10,7 +12,7 @@ import lombok.Getter;
 @DataClassBuilder(jdocs = "The type of the Fruit which has a problem with worms.",
         builderMethodJDocs = "Creates the new builder object for Apple",
         buildMethodJDocs = "Gathers all passed information from AppleBuilder and the base class and creates new Apple object",
-        implementInterfaces = {"eu.rsulkowski.jdoocsoup.app.Colorful"}
+        implementInterfaces = {Colorful.class, Serializable.class}
 )
 public class Apple extends Fruit {
 
@@ -21,6 +23,7 @@ public class Apple extends Fruit {
     private String tagToBeIgnored;
 
     Apple(String wormName, int weight, String color) {
+
         this.wormName = wormName;
         this.weight = weight;
         this.color = color;

@@ -3,20 +3,33 @@ package eu.rsulkowski.jdoocsoup.processor.descriptor;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.sun.tools.javac.code.Attribute;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 import eu.rsulkowski.jdoocsoup.annotation.DataClassBuilder;
 import eu.rsulkowski.jdoocsoup.processor.utils.ElementsUtils;
 import lombok.Getter;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
-import javax.lang.model.type.MirroredTypeException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by rsulkowski on 10/2/17.
  */
+
 /**
  * Contains the description of the DataClassBuilder such as: package name, element kind etc.
  */
@@ -52,12 +65,49 @@ public class DataClassBuilderDescriptor {
         this.typeElement = element;
         this.elementKind = element.getKind();
         this.typeSpecBuilder = TypeSpec.classBuilder(dataClassBuilderName);
-        for (String superInterface : annotation.implementInterfaces()){
-            TypeName superI = ClassName.bestGuess(superInterface);
-            typeSpecBuilder.addSuperinterface(superI);
-        }
+        parseImplementInterfaces();
         typeSpecBuilder.addModifiers(Modifier.PUBLIC);
         parseAll();
+    }
+
+    private void parseImplementInterfaces() {
+        AnnotationMirror annotationMirror = getAnnotationMirror(this.typeElement, DataClassBuilder.class.getName());
+        AnnotationValue inflationArgsValue = getAnnotationValue(annotationMirror, "implementInterfaces");
+        if (inflationArgsValue != null) {
+            List<Attribute.Class> list = (List<Attribute.Class>) inflationArgsValue.getValue();
+            for (Attribute.Class superInterface : list)
+            {
+                TypeName superI = ClassName.bestGuess(superInterface.getValue().toString());
+                typeSpecBuilder.addSuperinterface(superI);
+            }
+        }
+    }
+
+    private static AnnotationMirror getAnnotationMirror(TypeElement typeElement, String className) {
+
+        for (AnnotationMirror m : typeElement.getAnnotationMirrors()) {
+
+            if (m.getAnnotationType().toString().equals(className)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
+        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+            if (entry.getKey().getSimpleName().toString().equals(key)) {
+
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+
+    private TypeElement asTypeElement(TypeMirror typeMirror) {
+        Types TypeUtils = this.processingEnvironment.getTypeUtils();
+        return (TypeElement) TypeUtils.asElement(typeMirror);
     }
 
     private void parseAll() {

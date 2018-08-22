@@ -68,7 +68,7 @@ public @interface DataClassBuilder {
      * Contains the JavaDocs for the build method.
      * @return buildMethodJDocs
      */
-    String[] implementInterfaces() default {};
+    Class[] implementInterfaces() default {};
 
 
     /**
