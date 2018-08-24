@@ -10,5 +10,5 @@ public interface Colorful {
      * @param color as a name, ex. red
      * @return builder.
      */
-    Colorful color(String color);
+    Colorful withColor(String color);
 }

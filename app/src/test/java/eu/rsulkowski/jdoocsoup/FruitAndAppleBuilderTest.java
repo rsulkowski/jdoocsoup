@@ -15,15 +15,14 @@ public class FruitAndAppleBuilderTest {
 
     @Test
     public void createAppleByBuilder() {
-        Apple apple = AppleBuilder.create()
-                .wormName("Teddy")
-                .color("Green")
-                .weight(2)
+        Apple apple = AppleBuilder.create("Teddy")
+                .withColor("Green")
+                .withWeight(2).withPoint("fdsfds")
                 .build();
         apple.getSizeKg();
         Assert.assertEquals("Teddy", apple.getWormName());
         Assert.assertEquals("Green", apple.getColor());
-        apple.getWeight().toString();
+
 
     }
 

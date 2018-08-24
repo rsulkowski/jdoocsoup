@@ -49,6 +49,7 @@ public class DataClassBuilderDescriptor {
     private final TypeSpec.Builder typeSpecBuilder;
     private final List<ExecutableElement> methods = new ArrayList<>();
     private final List<VariableElement> fields = new ArrayList<>();
+    private final boolean publicBuildConstructor;
     private TypeElement buildMethodReturnType;
 
     public DataClassBuilderDescriptor(ProcessingEnvironment env, TypeElement element) {
@@ -66,6 +67,7 @@ public class DataClassBuilderDescriptor {
         this.typeElement = element;
         this.elementKind = element.getKind();
         this.typeSpecBuilder = TypeSpec.classBuilder(dataClassBuilderName);
+        this.publicBuildConstructor = annotation.publicBuildConstructor();
         parseImplementInterfaces();
         typeSpecBuilder.addModifiers(Modifier.PUBLIC);
         parseAll();

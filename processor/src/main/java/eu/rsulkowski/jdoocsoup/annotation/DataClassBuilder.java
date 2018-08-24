@@ -64,6 +64,8 @@ public @interface DataClassBuilder {
      */
     String buildMethodJDocs() default "";
 
+    boolean publicBuildConstructor() default false;
+
     /**
      * Contains the JavaDocs for the build method.
      * @return buildMethodJDocs

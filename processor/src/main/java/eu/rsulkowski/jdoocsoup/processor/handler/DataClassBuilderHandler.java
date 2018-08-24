@@ -62,8 +62,10 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
                 }
 
                 if (isRequired == null) {
-                    MethodSpec.Builder methodSpec = createBuilderSetterMethodFor(variableElement, builderMethodDocsAnnotation);
-                    builderClassSpecBuilder.addMethod(methodSpec.build());
+                    List<MethodSpec.Builder> methodSpecs = createBuilderSetterMethodFor(variableElement, builderMethodDocsAnnotation);
+                    for (MethodSpec.Builder methodSpec : methodSpecs) {
+                        builderClassSpecBuilder.addMethod(methodSpec.build());
+                    }
                 } else {
                     requiredElements.add(variableElement);
                 }
@@ -78,12 +80,18 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         builderClassSpecBuilder.addMethod(createPrivateConstructor(requiredParams));
     }
 
-    private MethodSpec.Builder createBuilderSetterMethodFor(VariableElement variableElement, DataClassBuilder.MethodDocs builderMethodDocsAnnotation) {
-
+    private List<MethodSpec.Builder> createBuilderSetterMethodFor(VariableElement variableElement, DataClassBuilder.MethodDocs builderMethodDocsAnnotation) {
+        List<MethodSpec.Builder> methods = new ArrayList<>();
         String setterMethodName = variableElement.getSimpleName().toString();
 
         if (!descriptor.getSetterPrefix().isEmpty()) {
             setterMethodName = descriptor.getSetterPrefix() + StringUtils.capitalize(setterMethodName);
+        }
+
+        String varTypeName = variableElement.asType().toString();
+        if (isListWithItems(setterMethodName, varTypeName)){
+            MethodSpec.Builder methodSpecListItem = methodForListItem(variableElement, builderMethodDocsAnnotation, setterMethodName, varTypeName);
+            methods.add(methodSpecListItem);
         }
 
         MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(setterMethodName).addModifiers(Modifier.PUBLIC)
@@ -95,7 +103,30 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         if (builderMethodDocsAnnotation != null) {
             methodSpec.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
         }
-        return methodSpec;
+        methods.add(methodSpec);
+        return methods;
+    }
+
+    private MethodSpec.Builder methodForListItem(VariableElement variableElement, DataClassBuilder.MethodDocs builderMethodDocsAnnotation, String setterMethodName, String varTypeName) {
+        String listTypeName = varTypeName.substring(varTypeName.indexOf("<")+1,varTypeName.indexOf(">"));
+        String methodName = setterMethodName.substring(0, setterMethodName.length()-1);
+        String paramName = variableElement.getSimpleName().toString();
+        String oneParamName = paramName.substring(0, paramName.length()-1);
+
+        MethodSpec.Builder methodSpecListItem = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC)
+                .addParameter(ParameterSpec.builder(ClassName.bestGuess(listTypeName), oneParamName).build())
+                .addStatement("if (this.$N == null) { $N = new java.util.ArrayList();}", variableElement.getSimpleName(), variableElement.getSimpleName())
+                .addStatement("this.$N.add($N)", variableElement.getSimpleName(), oneParamName)
+                .addStatement("return this")
+                .returns(ClassName.get(descriptor.getPackageName(), descriptor.getDataClassBuilderName()));
+        if (builderMethodDocsAnnotation != null) {
+            methodSpecListItem.addJavadoc(builderMethodDocsAnnotation.value() + "\n");
+        }
+        return methodSpecListItem;
+    }
+
+    private boolean isListWithItems(String setterMethodName, String varTypeName) {
+        return varTypeName.startsWith("java.util.List") && setterMethodName.endsWith("s");
     }
 
     private List<ParameterSpec> parseRequiredParams(List<VariableElement> requiredElements) {
@@ -116,7 +147,7 @@ public class DataClassBuilderHandler extends BaseAnnotationHandler<DataClassBuil
         return MethodSpec.constructorBuilder()
                 .addParameters(requiredElements)
                 .addCode(assignRequiredFields(requiredElements))
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(descriptor.isPublicBuildConstructor() ? Modifier.PUBLIC : Modifier.PRIVATE)
                 .build();
     }
 
